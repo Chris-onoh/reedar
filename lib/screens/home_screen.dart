@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/pdf_service.dart';
 import 'reader_screen.dart';
 import 'manifesto_screen.dart';
+import 'calibration_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,13 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
         // Add artificial delay for "processing" vibe
         await Future.delayed(const Duration(milliseconds: 800));
 
-        final text = await _pdfService.extractText(file);
+        final processedPdf = await _pdfService.extractText(file);
 
         if (mounted) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ReaderScreen(content: text),
+              builder: (context) => ReaderScreen(processedPdf: processedPdf),
             ),
           );
         }
@@ -163,6 +164,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 14,
                       letterSpacing: 2,
                       decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // Calibration Button
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CalibrationScreen(),
+                      ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.purpleAccent.withOpacity(0.7),
+                  ),
+                  child: Text(
+                    "RUN SYSTEM CALIBRATION",
+                    style: GoogleFonts.shareTechMono(
+                      fontSize: 14,
+                      letterSpacing: 2,
                     ),
                   ),
                 ),

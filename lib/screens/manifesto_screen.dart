@@ -47,6 +47,83 @@ In neurodivergent readers, particularly those with a VA span deficit, this spotl
 Underlying the dorsal stream function is the magnocellular system, composed of large neurons specialized for detecting rapid changes, motion, and low-contrast stimuli. The Magnocellular Theory of Dyslexia suggests that a deficit in this pathway leads to unstable binocular fixation and poor temporal resolution. This instability causes letters to appear to move, blur, or overlap—a phenomenon exacerbated by high-contrast, static, serif fonts.
 
 By manipulating font weight and size, typography can differentially engage the parvocellular (detail/color) and magnocellular (motion/contrast) pathways. Heavier, larger fonts may provide a stronger stimulus to the sluggish magnocellular system, stabilizing the visual percept.
+
+3. Computational Neuroscience: Predictive Coding and Active Inference
+
+The brain functions as a prediction engine, continuously generating internal models of the world to minimize "surprisal" or prediction error. This framework, known as Predictive Coding or the Free Energy Principle (FEP), offers a compelling explanation for why "irregular" or "tilted" fonts improve attention in ADHD.
+
+3.1 The Free Energy Principle in Reading
+
+According to the FEP, the brain strives to minimize the difference between top-down predictions (priors) and bottom-up sensory inputs (likelihoods).
+
+    Top-Down Priors: In reading, the brain predicts the next word based on syntax and semantics, and the next letter shape based on learned orthographic rules.
+
+    Bottom-Up Inputs: The actual visual data arriving at the retina.
+
+    Prediction Error: The discrepancy between the prediction and the input.
+
+In a standard, highly legible font (e.g., Arial or Times New Roman), the visual priors are extremely strong. The brain's model of the letter 'e' perfectly matches the incoming visual data. The prediction error is minimized almost instantly. While this is efficient for a neurotypical brain, it creates a specific vulnerability for the ADHD brain: Habituation.
+
+3.2 Habituation and the "Glazing Over" Effect
+
+When prediction errors are consistently low, the brain reduces the "precision weighting" (synaptic gain) assigned to the sensory channel. Essentially, the system determines that the visual input offers no new information (no surprisal), and attentional resources are withdrawn. This leads to the phenomenon of "glazing over," where the eyes track the text, but the mind wanders—a hallmark of ADHD reading performance.
+
+3.3 Typographic "Surprisal" and Active Inference
+
+Altering font shapes, introducing slight tilts, or using "dysfluent" typefaces introduces a persistent stream of low-level prediction errors.
+
+    Micro-Surprisal: A letter that is tilted 5 degrees or has an irregular "handwritten" shape violates the strict geometric prior of the standard alphabet.
+
+    Active Inference: To minimize this persistent error, the brain must engage Active Inference. It cannot simply rely on top-down predictions; it must actively sample the sensory evidence with higher precision.
+
+This forces the reader into a state of heightened vigilance. The "noise" or irregularity in the font acts as a "teaching signal," commanding the attentional network to remain online to resolve the visual discrepancy. This upregulation of sensory precision prevents the collapse of attention associated with habituation.
+
+4. The Locus Coeruleus-Norepinephrine (LC-NE) System
+
+The mechanism by which "typographic surprise" translates into sustained attention is mediated neurochemically by the Locus Coeruleus (LC), the primary source of norepinephrine (NE) in the cortex. The interaction between font irregularity and LC dynamics is crucial for understanding reading improvements in ADHD.
+
+4.1 Phasic vs. Tonic Modes of the LC
+
+The LC operates in two distinct firing modes that correlate with behavioral states:
+
+    Tonic Mode: A baseline rate of firing.
+
+        Low Tonic: Associated with drowsiness, inattention, and non-alert states.
+
+        High Tonic: Associated with distractibility, anxiety, and scanning behavior (lability).
+
+    Phasic Mode: Bursts of high-frequency activity in response to task-relevant or salient stimuli. This mode optimizes task performance.
+
+4.2 The Adaptive Gain Theory
+
+The Adaptive Gain Theory proposes that phasic NE release optimizes the "gain" of the neural response function.
+
+    Signal Enhancement: NE enhances the response to the target stimulus (the letter being read).
+
+    Noise Suppression: NE suppresses spontaneous background activity (neural noise).
+    This increases the Signal-to-Noise Ratio (SNR) within the sensory cortex, facilitating precise processing.
+
+4.3 Pharmacological Parallels: Typography as Stimulant
+
+Stimulant medications for ADHD (e.g., Methylphenidate) work by blocking the reuptake of dopamine and norepinephrine, effectively increasing their availability and stabilizing the LC in an optimal state.
+Typographic Novelty functions as a sensory-based parallel to this pharmacological mechanism.
+
+    The Novelty Trigger: The LC receives direct input from the prefrontal cortex and superior colliculus regarding stimulus salience. "Novel" stimuli trigger phasic LC bursts.
+
+The "Snake Raised Its Head" Effect: Studies show that introducing content novelty in reading passages significantly improves performance in ADHD students by meeting their need for stimulation.
+
+    Visual Novelty: Irregular or "tilted" fonts provide a constant stream of visual novelty. Each letter presents a slight deviation from the norm, triggering a micro-phasic burst of NE. This keeps the LC "engaged," preventing the slide into a low-tonic, inattentive state.
+
+4.4 Adrenergic Receptor Distribution and Layer-Specific Effects
+
+The impact of this NE release is layer-specific within the cortex, influencing how sensory data is processed.
+
+Cortical Layer	Receptor Density	Functional Effect of NE
+Layer 2/3 (Superficial)	High α1, High β, Low α2	Signal Integration: Enhances associative processing and communication between cortical areas.
+Layer 4 (Input)	Low α1, Low α2, Low β	Sensory Gating: Less direct modulation, preserving the raw fidelity of the bottom-up input.
+Layer 5/6 (Deep)	Mod-High α1, Low α2, Mod β	Output Modulation: Facilitates the "broadcast" of the processed signal to other brain regions.
+
+By driving NE release, irregular typography specifically enhances activity in the superficial and deep layers, promoting the integration of the visual symbol with higher-order cognitive networks (semantic/phonological) while maintaining a high SNR.
 """;
 
   late List<String> _paragraphs;
@@ -144,21 +221,40 @@ By manipulating font weight and size, typography can differentially engage the p
 
   List<Widget> _buildParagraphs() {
     List<Widget> paragraphWidgets = [];
+    final headerRegex = RegExp(r'^\d+(\.\d+)*');
+
     for (var paragraph in _paragraphs) {
       if (paragraph.trim().isEmpty) continue;
 
-      // Split into words
-      List<String> words = paragraph.split(RegExp(r'\s+'));
-
-      paragraphWidgets.add(
-        Wrap(
-          spacing: 6,
-          runSpacing: 10,
-          children: words.map((word) => _buildChaoticWord(word)).toList(),
-        ),
-      );
-      // Add space between paragraphs
-      paragraphWidgets.add(const SizedBox(height: 20));
+      // Check if it's a header
+      if (headerRegex.hasMatch(paragraph)) {
+        paragraphWidgets.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 30, bottom: 10),
+            child: Text(
+              paragraph,
+              style: GoogleFonts.orbitron(
+                color: Colors.cyanAccent,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ).animate().shimmer(duration: 2000.ms, color: Colors.purpleAccent),
+          ),
+        );
+      } else {
+        // Normal paragraph
+        List<String> words = paragraph.split(RegExp(r'\s+'));
+        paragraphWidgets.add(
+          Wrap(
+            spacing: 6,
+            runSpacing: 10,
+            children: words.map((word) => _buildChaoticWord(word)).toList(),
+          ),
+        );
+        // Add space between paragraphs
+        paragraphWidgets.add(const SizedBox(height: 20));
+      }
     }
     return paragraphWidgets;
   }
