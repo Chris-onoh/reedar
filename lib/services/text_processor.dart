@@ -11,9 +11,26 @@ class TextProcessor {
     // Remove hyphens at end of lines (de-hyphenation)
     String text = rawText.replaceAll(RegExp(r'-\n'), '');
 
-    // Replace multiple newlines with a marker, then remove single newlines
+    // Ensure all types of newlines are treated as spaces first (unless paragraph)
+    text = text.replaceAll(RegExp(r'\r\n'), '\n');
+    text = text.replaceAll(RegExp(r'\r'), '\n');
+
+    // Replace multiple newlines with a marker
     text = text.replaceAll(RegExp(r'\n\n+'), '||PARAGRAPH||');
+
+    // Split CamelCase words or sticky capitalization (e.g. "end.The" -> "end. The")
+    // 1. Lowercase followed by Uppercase (e.g. "wordWord" -> "word Word")
+    text = text.replaceAllMapped(RegExp(r'(?<=[a-z])(?=[A-Z])'), (m) => ' ');
+    // 2. Period/Comma followed immediately by Upper/Word (e.g. "end.The" -> "end. The")
+    text = text.replaceAllMapped(
+      RegExp(r'(?<=[.,;:])(?=[A-Za-z])'),
+      (m) => ' ',
+    );
+
+    // Replace single newlines with spaces
     text = text.replaceAll('\n', ' ');
+
+    // Restore paragraphs
     text = text.replaceAll('||PARAGRAPH||', '\n\n');
 
     // Collapse multiple spaces

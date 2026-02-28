@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
+import 'screens/main_scaffold.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,17 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Reedar',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.cyanAccent,
-          brightness: Brightness.dark,
-        ),
-        textTheme: GoogleFonts.shareTechMonoTextTheme(
-          ThemeData.dark().textTheme,
-        ),
-      ),
-      home: const HomeScreen(),
+      theme: ReedarTheme.theme,
+      home: const MainScaffold(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,231 +1,189 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:iconly/iconly.dart';
 
-import '../services/pdf_service.dart';
-import 'reader_screen.dart';
-import 'manifesto_screen.dart';
-import 'calibration_screen.dart';
+import '../theme/app_theme.dart';
+import '../widgets/glass_container.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final PdfService _pdfService = PdfService();
-  bool _isLoading = false;
-  String _statusText = "SYSTEM IDLE";
-
-  Future<void> _pickFile() async {
-    setState(() {
-      _isLoading = true;
-      _statusText = "SCANNING FILE SYSTEM...";
-    });
-
-    try {
-      final file = await _pdfService.pickPdfFile();
-      if (file != null) {
-        setState(() => _statusText = "DECRYPTING PDF DATA...");
-        // Add artificial delay for "processing" vibe
-        await Future.delayed(const Duration(milliseconds: 800));
-
-        final processedPdf = await _pdfService.extractText(file);
-
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReaderScreen(processedPdf: processedPdf),
-            ),
-          );
-        }
-      } else {
-        setState(() => _statusText = "SELECTION ABORTED");
-      }
-    } catch (e) {
-      setState(() => _statusText = "CRITICAL ERROR: $e");
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // Background grid simulation
-          Positioned.fill(child: CustomPaint(painter: GridPainter())),
-
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                      "REEDAR",
-                      style: GoogleFonts.orbitron(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.cyanAccent,
-                        letterSpacing: 8,
+      backgroundColor: ReedarColors.cream,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              FadeInDown(
+                duration: const Duration(milliseconds: 600),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "My Spaces",
+                      style: GoogleFonts.outfit(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                        color: ReedarColors.mocha,
                       ),
-                    )
-                    .animate(onPlay: (controller) => controller.repeat())
-                    .shimmer(duration: 2000.ms, color: Colors.purpleAccent)
-                    .effect(duration: 3000.ms),
+                    ),
+                    CircleAvatar(
+                      backgroundColor: ReedarColors.mocha,
+                      radius: 20,
+                      child: Text(
+                        "A",
+                        style: GoogleFonts.outfit(
+                          color: ReedarColors.cream,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
-                Container(
+              // Search Bar Placeholder
+              FadeInDown(
+                delay: const Duration(milliseconds: 100),
+                duration: const Duration(milliseconds: 600),
+                child: GlassContainer(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
+                    horizontal: 16,
+                    vertical: 4,
                   ),
+                  borderRadius: BorderRadius.circular(16),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search your notebooks...",
+                      hintStyle: GoogleFonts.outfit(
+                        color: ReedarColors.charcoal.withOpacity(0.5),
+                      ),
+                      border: InputBorder.none,
+                      icon: Icon(
+                        IconlyLight.search,
+                        color: ReedarColors.mocha.withOpacity(0.7),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Recent Spaces Grid
+              Expanded(
+                child: FadeInUp(
+                  delay: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 600),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.85,
+                    children: [
+                      // Example Cards
+                      _buildSpaceCard(
+                        title: "Quantum Physics",
+                        subtitle: "3 sources",
+                        color: ReedarColors.sage.withOpacity(0.3),
+                        icon: IconlyBold.paper,
+                      ),
+                      _buildSpaceCard(
+                        title: "Vegan Recipes",
+                        subtitle: "12 sources",
+                        color: ReedarColors.latte.withOpacity(0.5),
+                        icon: IconlyBold.heart,
+                      ),
+                      _buildSpaceCard(
+                        title: "Project Alpha",
+                        subtitle: "Updated 2m ago",
+                        color: Colors.blueGrey.withOpacity(0.1),
+                        icon: IconlyBold.work,
+                      ),
+                      _buildSpaceCard(
+                        title: "Dart Guide",
+                        subtitle: "Reference",
+                        color: ReedarColors.matcha.withOpacity(0.4),
+                        icon: IconlyBold.bookmark,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpaceCard({
+    required String title,
+    required String subtitle,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            // Open space detail (placeholder)
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.cyanAccent.withOpacity(0.5),
-                    ),
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.6),
+                    shape: BoxShape.circle,
                   ),
-                  child: Text(
-                    "NEURO-STIMULATION PROTOCOL: ACTIVE",
-                    style: GoogleFonts.shareTechMono(
-                      color: Colors.cyanAccent,
-                      fontSize: 14,
-                    ),
-                  ),
+                  child: Icon(icon, color: ReedarColors.mocha),
                 ),
-
-                const SizedBox(height: 60),
-
-                // Main Action Button
-                GestureDetector(
-                      onTap: _isLoading ? null : _pickFile,
-                      child: Container(
-                        height: 80,
-                        width: 280,
-                        decoration: BoxDecoration(
-                          color: _isLoading
-                              ? Colors.grey[900]
-                              : Colors.cyanAccent.withOpacity(0.1),
-                          border: Border.all(
-                            color: _isLoading ? Colors.grey : Colors.cyanAccent,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.cyanAccent.withOpacity(0.2),
-                              blurRadius: 20,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            _isLoading ? "PROCESSING..." : "INITIATE UPLOAD",
-                            style: GoogleFonts.audiowide(
-                              fontSize: 24,
-                              color: _isLoading ? Colors.grey : Colors.white,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: ReedarColors.mocha,
                       ),
-                    )
-                    .animate()
-                    .scale(duration: 200.ms, curve: Curves.easeInOut)
-                    .then(delay: 1000.ms)
-                    .shake(hz: 4, curve: Curves.easeInOut),
-
-                const SizedBox(height: 20),
-
-                // Manifesto Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ManifestoScreen(),
-                      ),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.cyanAccent.withOpacity(0.7),
-                  ),
-                  child: Text(
-                    "VIEW PROTOCOL MANIFESTO",
-                    style: GoogleFonts.shareTechMono(
-                      fontSize: 14,
-                      letterSpacing: 2,
-                      decoration: TextDecoration.underline,
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Calibration Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CalibrationScreen(),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.outfit(
+                        fontSize: 14,
+                        color: ReedarColors.charcoal.withOpacity(0.7),
                       ),
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.purpleAccent.withOpacity(0.7),
-                  ),
-                  child: Text(
-                    "RUN SYSTEM CALIBRATION",
-                    style: GoogleFonts.shareTechMono(
-                      fontSize: 14,
-                      letterSpacing: 2,
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                Text(
-                  _statusText,
-                  style: GoogleFonts.shareTechMono(
-                    color: Colors.redAccent,
-                    fontSize: 16,
-                  ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
-}
-
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.green.withOpacity(0.1)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    for (double i = 0; i < size.width; i += 40) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
-    }
-    for (double i = 0; i < size.height; i += 40) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
